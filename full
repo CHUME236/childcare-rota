@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Childcare Rota</title>
+<link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+<h1>Childcare Rota</h1>
+<div id="calendar"></div>
+<script src="script.js"></script>
+</body>
+</html>
+body {
+font-family: Arial, sans-serif;
+margin: 20px;
+background-color: #f8f8f8;
+}
+
+h1 {
+text-align: center;
+}
+
+#calendar {
+display: grid;
+grid-template-columns: repeat(7, 1fr);
+gap: 10px;
+max-width: 900px;
+margin: 0 auto;
+}
+
+.day {
+background: white;
+padding: 10px;
+border: 1px solid #ccc;
+text-align: center;
+min-height: 120px;
+position: relative;
+}
+
+.day-header {
+font-weight: bold;
+}
+
+.select-caregiver {
+margin-top: 10px;
+width: 100%;
+}
+
+.mother {
+background-color: #ffff99;
+}
+
+.father {
+background-color: #99ff99;
+}
+const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+const today = new Date();
+const currentMonth = today.getMonth();
+const currentYear = today.getFullYear();
+
+function buildCalendar(month, year) {
+const calendar = document.getElementById("calendar");
+calendar.innerHTML = "";
+
+const firstDay = new Date(year, month, 1).getDay();
+const totalDays = new Date(year, month + 1, 0).getDate();
+
+// Fill initial empty cells
+for (let i = 0; i < firstDay; i++) {
+calendar.appendChild(document.createElement("div"));
+}
+
+for (let day = 1; day <= totalDays; day++) {
+const cell = document.createElement("div");
+cell.className = "day";
+const date = `${year}-${month + 1}-${day}`;
+const saved = localStorage.getItem(date);
+
+const header = document.createElement("div");
+header.className = "day-header";
+header.textContent = `${day} ${daysOfWeek[new Date(year, month, day).getDay()]}`;
+
+const select = document.createElement("select");
+select.className = "select-caregiver";
+select.innerHTML = `<option value="">--Select--</option>
+<option value="mother">Mother</option>
+<option value="father">Father</option>`;
+
+if (saved) {
+select.value = saved;
+cell.classList.add(saved);
+}
+
+select.addEventListener("change", () => {
+localStorage.setItem(date, select.value);
+cell.className = "day";
+if (select.value) cell.classList.add(select.value);
+});
+
+cell.appendChild(header);
+cell.appendChild(select);
+calendar.appendChild(cell);
+}
+}
+
+buildCalendar(currentMonth, currentYear);
